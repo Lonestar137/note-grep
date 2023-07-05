@@ -1,7 +1,7 @@
 
 [note]
 filetype = "yml"
-note_dir = "${HOME}/Documents/TIL/"
+note_dir="/home/your_user/Documents/TIL/"
 
 
 [pager]

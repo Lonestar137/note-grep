@@ -11,8 +11,11 @@ REPO_DIR="$(dirname "$script_dir")"
 
 search_yaml_files(){
   local pattern="$1"
-  local directory=$(toml $REPO_DIR/config.toml note.note_dir)
-  local filetype=$(toml $REPO_DIR/config.toml note.filetype)
+  # get toml value but remove quotes
+  #
+
+  local directory=$(toml get $REPO_DIR/config.toml note.note_dir | sed 's/"//g')
+  local filetype=$(toml get $REPO_DIR/config.toml note.filetype | sed 's/"//g')
   local temp_file="/tmp/note_temp.${filetype}"
 
   if [ ! -d "$directory" ]; then
@@ -26,7 +29,7 @@ search_yaml_files(){
   fi
 
   find "$directory" -type f -name "*${filetype}" -print0 | while IFS= read -r -d '' file; do
-    awk -v pattern="$pattern" -v file=".$file" -f ${REPO_DIR}/src/awk/grep.awk ".$file" >> "$temp_file"
+    awk -v pattern="$pattern" -v file="$file" -f ${REPO_DIR}/src/awk/grep_til.awk "$file" >> "$temp_file"
   done
 
   # Display the concatenated sections using less
@@ -43,7 +46,7 @@ search_yaml_files(){
       less "$temp_file"
     fi
   else
-    echo "No matches found."
+    echo "Check script, temp file missing: $temp_file "
   fi
 
   # Clean up temporary file
