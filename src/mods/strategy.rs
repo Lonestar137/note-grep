@@ -89,3 +89,23 @@ impl FileSystemInterface for WindowsFileSystemInterface {
    }
 }
 
+
+pub struct SystemInterfaceBuilder {
+   strategy: Box<dyn FileSystemInterface>,
+}
+
+impl SystemInterfaceBuilder {
+   pub fn new() -> SystemInterfaceBuilder {
+      let strategy: Box<dyn FileSystemInterface> = if cfg!(target_os = "windows") {
+         Box::new(WindowsFileSystemInterface)
+      } else {
+         Box::new(UnixFileSystemInterface)
+      };
+
+      SystemInterfaceBuilder { strategy }
+   }
+
+   pub fn build(self) -> Box<dyn FileSystemInterface> {
+      self.strategy
+   }
+}

@@ -1,7 +1,7 @@
 mod mods;
 use mods::grep::NoteBlockBuilder;
 use mods::config::Config;
-use mods::strategy::FileSystemInterface;
+use mods::strategy::{FileSystemInterface, SystemInterfaceBuilder};
 
 use std::io::Write;
 use std::process::{Stdio, Command};
@@ -24,18 +24,10 @@ fn get_config(strategy: &dyn FileSystemInterface, path: String) -> Config {
     config 
 }
 
-fn determine_strategy() -> Box<dyn FileSystemInterface> {
-    if cfg!(target_os = "windows") {
-        Box::new(mods::strategy::WindowsFileSystemInterface)
-    } else {
-        Box::new(mods::strategy::UnixFileSystemInterface)
-    }
-}
-
 fn main() {
     //let config_file_dir = "./config.toml"; // TODO: let this be changed by command line argument
     let config_file_dir = "";
-    let strategy: Box<dyn FileSystemInterface> = determine_strategy();
+    let strategy: Box<dyn FileSystemInterface> = SystemInterfaceBuilder::new().build();
     let config: Config = get_config(&*strategy, config_file_dir.to_string());
 
     let pager: String = config.pager.pager.clone();
