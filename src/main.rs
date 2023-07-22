@@ -6,8 +6,20 @@ use mods::strategy::FileSystemInterface;
 use std::io::Write;
 use std::process::{Stdio, Command};
 
+// TODO: create config file automatically.
+// TODO: use a state pattern to manage the config files location and state, pass to strategy as
+// paremeter.
+
+// If a custom config path is defined it will override the default config.
 fn get_config(strategy: &dyn FileSystemInterface, path: String) -> Config {
-    let contents = strategy.read_config(&path);
+    let contents = if path.is_empty() {
+        println!("Using default config");
+        strategy.read_default_config()
+    } else {
+        println!("Using custom config");
+        strategy.read_config(&path)
+    };
+
     let config: Config = toml::from_str(&contents).unwrap();
     config 
 }
@@ -21,7 +33,8 @@ fn determine_strategy() -> Box<dyn FileSystemInterface> {
 }
 
 fn main() {
-    let config_file_dir = "./config.toml";
+    //let config_file_dir = "./config.toml"; // TODO: let this be changed by command line argument
+    let config_file_dir = "";
     let strategy: Box<dyn FileSystemInterface> = determine_strategy();
     let config: Config = get_config(&*strategy, config_file_dir.to_string());
 
@@ -37,7 +50,7 @@ fn main() {
         stdin.write_all(note_block.content.as_bytes()).expect("Failed to write to stdin.");
     }
 
-    let status = child.wait().expect("Failed to wait for 'less' process.");
+    let status = child.wait().expect("Failed to wait for pager process.");
     if !status.success() {
         eprintln!("'less' command returned an error: {:?}", status);
     }
