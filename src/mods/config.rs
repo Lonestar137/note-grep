@@ -1,19 +1,19 @@
-use toml;
 use serde::Deserialize;
-use std::fs::File;
-use std::io::Read;
 
+#[allow(unused)]
 #[derive(Debug, Deserialize)]
 struct Note {
    filetype: String,
    note_dir: String,
 }
 
+#[allow(unused)]
 #[derive(Debug, Deserialize)]
 struct Pager {
    pager: String,
 }
 
+#[allow(unused)]
 #[derive(Debug, Deserialize)]
 pub struct Config {
    note: Note,
@@ -22,6 +22,7 @@ pub struct Config {
 
 
 
+// Example
     // let file_path = "config.toml";
     // let mut file = std::fs::File::open(file_path).expect("Failed to read file.");
     // let mut contents = String::new();
