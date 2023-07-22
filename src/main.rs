@@ -1,11 +1,15 @@
 mod mods;
+use mods::grep::NoteBlockBuilder;
 use mods::config::Config;
 use mods::strategy::FileSystemInterface;
 
+use std::io::Write;
+use std::process::{Stdio, Command};
+
 fn get_config(strategy: &dyn FileSystemInterface, path: String) -> Config {
     let contents = strategy.read_config(&path);
-    let running_config: Config = toml::from_str(&contents).unwrap();
-    running_config
+    let config: Config = toml::from_str(&contents).unwrap();
+    config 
 }
 
 fn determine_strategy() -> Box<dyn FileSystemInterface> {
@@ -17,8 +21,25 @@ fn determine_strategy() -> Box<dyn FileSystemInterface> {
 }
 
 fn main() {
+    let config_file_dir = "./config.toml";
     let strategy: Box<dyn FileSystemInterface> = determine_strategy();
-    let config = get_config(&*strategy, "./config.toml".to_string());
+    let config: Config = get_config(&*strategy, config_file_dir.to_string());
 
-    println!("{:?}", config);
+    let pager: String = config.pager.pager.clone();
+    let note_block = NoteBlockBuilder::new(config, Box::new(&*strategy), "hello".to_string())
+        .fetch_content()
+        .build();
+
+    let mut less_cmd = Command::new(pager);
+    less_cmd.stdin(Stdio::piped());
+    let mut child = less_cmd.spawn().expect("Failed to spawn pager command");
+    if let Some(mut stdin) = child.stdin.take() {
+        stdin.write_all(note_block.content.as_bytes()).expect("Failed to write to stdin.");
+    }
+
+    let status = child.wait().expect("Failed to wait for 'less' process.");
+    if !status.success() {
+        eprintln!("'less' command returned an error: {:?}", status);
+    }
+    //println!("{:?}", note_block);
 }

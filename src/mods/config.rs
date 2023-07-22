@@ -2,22 +2,22 @@ use serde::Deserialize;
 
 #[allow(unused)]
 #[derive(Debug, Deserialize)]
-struct Note {
-   filetype: String,
-   note_dir: String,
+pub struct Note {
+   pub filetype: String,
+   pub note_dir: String,
 }
 
 #[allow(unused)]
 #[derive(Debug, Deserialize)]
-struct Pager {
-   pager: String,
+pub struct Pager {
+   pub pager: String,
 }
 
 #[allow(unused)]
 #[derive(Debug, Deserialize)]
 pub struct Config {
-   note: Note,
-   pager: Pager,
+   pub note: Note,
+   pub pager: Pager,
 }
 
 

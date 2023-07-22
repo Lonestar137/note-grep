@@ -1,10 +1,11 @@
 
 [note]
 filetype = "yml"
-note_dir="/home/your_user/Documents/TIL/"
-
+#note_dir="/home/your_user/Documents/TIL/"
+note_dir="/home/jonesgc/Documents/TIL/"
 
 [pager]
 # Command to view files with. I.e. bat, cat, glow, whatever you want.
-pager = "less -R"
+#pager = "less -R"
+pager = "less"
 
