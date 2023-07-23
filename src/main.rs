@@ -24,15 +24,27 @@ fn get_config(strategy: &dyn FileSystemInterface, path: String) -> Config {
     config 
 }
 
+// TODO: Move this out to it's own CLI args handler
+fn parse_args(args: Vec<String>) -> String {
+    if args.len() == 1 {
+        "".to_string()
+    } else {
+        args[1].to_string()
+    }
+}
+
 fn main() {
-    //let config_file_dir = "./config.toml"; // TODO: let this be changed by command line argument
-    let config_file_dir = "";
+    let args: Vec<String> = std::env::args().collect();
+    let config_file_dir = parse_args(args);
+    let regex_query = "test".to_string(); // TODO!!!! <-- need to get this from args 
+    
     let strategy: Box<dyn FileSystemInterface> = SystemInterfaceBuilder::new().build();
     let config: Config = get_config(&*strategy, config_file_dir.to_string());
 
     let pager: String = config.pager.pager.clone();
     let note_block = NoteBlockBuilder::new(config, Box::new(&*strategy), "hello".to_string())
         .fetch_content()
+        .filter_content(&regex_query) 
         .build();
 
     let mut less_cmd = Command::new(pager);

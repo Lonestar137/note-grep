@@ -3,6 +3,7 @@
 filetype = "yml"
 #note_dir="/home/your_user/Documents/TIL/"
 note_dir="/home/jonesgc/Documents/TIL/"
+delimiter = "---"
 
 [pager]
 # Command to view files with. I.e. bat, cat, glow, whatever you want.

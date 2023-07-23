@@ -5,6 +5,7 @@ use serde::Deserialize;
 pub struct Note {
    pub filetype: String,
    pub note_dir: String,
+   pub delimiter: String,
 }
 
 #[allow(unused)]
