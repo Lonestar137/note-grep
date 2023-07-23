@@ -1,5 +1,5 @@
 mod mods;
-use mods::grep::{NoteBlockBuilder, NoteFile};
+use mods::grep::NoteBlockBuilder;
 use mods::config::Config;
 use mods::strategy::{FileSystemInterface, SystemInterfaceBuilder};
 

@@ -8,7 +8,7 @@ pub trait FileSystemInterface {
    fn read_file(&self, path: &str) -> String;
    fn read_config(&self, file_path: &str) -> String;
    fn read_default_config(&self) -> String;
-   fn list_files(&self, path: &str) -> Vec<String>;
+   fn list_files(&self, path: &str, file_ext: &str) -> Vec<String>;
 }
 
 
@@ -38,13 +38,15 @@ impl FileSystemInterface for UnixFileSystemInterface {
       config_file
    }
 
-   fn list_files(&self, path: &str) -> Vec<String> {
+   fn list_files(&self, path: &str, file_ext: &str) -> Vec<String> {
       // Implement the logic to list files for Unix
       let files = std::fs::read_dir(path).unwrap();
       let mut vec = Vec::new();
       for file in files {
-         let file = file.unwrap();
-         vec.push(file.path().to_str().unwrap().to_string());
+         let path_buf: &PathBuf = &file.as_ref().unwrap().path();
+         if  &path_buf.extension().unwrap().to_str().unwrap().to_string() == &file_ext {
+            vec.push(path_buf.to_str().unwrap().to_string());
+         }
       }
       vec
    }
@@ -77,17 +79,20 @@ impl FileSystemInterface for WindowsFileSystemInterface {
       config_file
    }
 
-   fn list_files(&self, path: &str) -> Vec<String> {
+   fn list_files(&self, path: &str, file_ext: &str) -> Vec<String> {
       // Implement the logic to list files for Windows
       let files = std::fs::read_dir(path).unwrap();
       let mut vec = Vec::new();
       for file in files {
-         let file = file.unwrap();
-         vec.push(file.path().to_str().unwrap().to_string());
+         let path_buf: &PathBuf = &file.as_ref().unwrap().path();
+         if  &path_buf.extension().unwrap().to_str().unwrap().to_string() == &file_ext {
+            vec.push(path_buf.to_str().unwrap().to_string());
+         }
       }
       vec
    }
 }
+
 
 
 pub struct SystemInterfaceBuilder {

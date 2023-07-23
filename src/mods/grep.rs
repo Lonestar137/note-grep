@@ -38,10 +38,12 @@ impl<'a> NoteBlockBuilder<'a> {
    }
 
    pub fn fetch_content(mut self) -> NoteBlockBuilder<'a> {
-      let note_dir = self.config.note.note_dir.clone();
-      let note_files = self.strategy.list_files(&note_dir);
+      let note_dir = &self.config.note.note_dir;
+      let note_filetype = &self.config.note.filetype;
+      let note_files = self.strategy.list_files(&note_dir, &note_filetype);
+
       for file in note_files {
-         let file_header: String = format!("`[{}]`\n", &file);
+         let file_header: String = format!("# File: `[{}]`\n", &file);
          let block = self.strategy.read_file(&file);
          let note_file = NoteFile { header: file_header, content: block.to_string() };
          self.note_block.content.push(note_file);
