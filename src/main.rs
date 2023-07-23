@@ -1,5 +1,5 @@
 mod mods;
-use mods::grep::NoteBlockBuilder;
+use mods::grep::{NoteBlockBuilder, NoteFile};
 use mods::config::Config;
 use mods::strategy::{FileSystemInterface, SystemInterfaceBuilder};
 
@@ -36,13 +36,13 @@ fn parse_args(args: Vec<String>) -> String {
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let config_file_dir = parse_args(args);
-    let regex_query = "test".to_string(); // TODO!!!! <-- need to get this from args 
+    let regex_query = "Jenkins".to_string(); // TODO!!!! <-- need to get this from args 
     
     let strategy: Box<dyn FileSystemInterface> = SystemInterfaceBuilder::new().build();
     let config: Config = get_config(&*strategy, config_file_dir.to_string());
 
     let pager: String = config.pager.pager.clone();
-    let note_block = NoteBlockBuilder::new(config, Box::new(&*strategy), "hello".to_string())
+    let note_block = NoteBlockBuilder::new(config, Box::new(&*strategy), Vec::new())
         .fetch_content()
         .filter_content(&regex_query) 
         .build();
@@ -51,7 +51,12 @@ fn main() {
     less_cmd.stdin(Stdio::piped());
     let mut child = less_cmd.spawn().expect("Failed to spawn pager command");
     if let Some(mut stdin) = child.stdin.take() {
-        stdin.write_all(note_block.content.as_bytes()).expect("Failed to write to stdin.");
+        let as_string: String = note_block.content
+            .iter()
+            .map(|s| format!("{}\n{}", s.header, s.content))
+            .collect::<Vec<String>>().join("\n");
+
+        stdin.write_all(as_string.as_bytes()).expect("Failed to write to stdin.");
     }
 
     let status = child.wait().expect("Failed to wait for pager process.");
