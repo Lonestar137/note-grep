@@ -6,8 +6,7 @@ alias file_viewer = less
 
 
 
-# let base_path = $"($env.HOME)/.cache/note-grep"
-let base_path = "/tmp/dumps/cache/yml"
+let base_path = $"($env.HOME)/.cache/note-grep"
 let filename = date now | format date "%m-%d-%y" | $"($in).yml"
 let note_file = $"($base_path)/($filename)"
 
@@ -28,15 +27,15 @@ def "main til" [] {
 def main [query: string] {
   if ($base_path | path exists) {
     let relevant_note_blocks = ls $base_path | where type == "file" |  where name =~ 'yml$' | each {
-      open ($in.name) --raw | split row "---:" | filter { $query in $in }
+      open $in.name --raw | split row "---:" | filter { $query in $in }
     }
 
-    let note_str = $relevant_note_blocks | str join '---'
-
-    $note_str | file_viewer
-
-    return $note_str
-    # filter { $query in $in }
+    if not ($relevant_note_blocks | is-empty) {
+      let note_str = $relevant_note_blocks | str join '---'
+      $note_str | file_viewer
+      return $note_str
+      # filter { $query in $in }
+    }
   } else {
     print "No notes to scan."
     return "No notes to scan."
